@@ -1,0 +1,16 @@
+{
+  "short_name": "WG Generator",
+  "name": "WireGuard Config Generator",
+  "description": "Generate secure WireGuard configurations for servers and clients effortlessly.",
+  "icons": [
+    {
+      "src": "ico/favicon-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#bb86fc"
+}

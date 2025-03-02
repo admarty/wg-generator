@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireGuard Config Generator</title>
+    <meta name="description" content="Generate secure WireGuard configurations for servers and clients effortlessly with our intuitive online tool. Perfect for VPN setup beginners and experts alike!">
+    <link rel="icon" sizes="64x64" href="ico/favicon-64.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#bb86fc">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            overflow-y: scroll;
+        }
+        h1, h3 {
+            color: #bb86fc;
+        }
+        .container {
+            max-width: 870px;
+            margin: 0 auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #c392ff;
+        }
+        input, select {
+            width: 98%;
+            padding: 7px;
+            margin: 0 auto;
+            margin-top: 5px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            font-size: 15px;
+        }
+        button {
+            display: block;
+            width: 50%;
+            margin: 0 auto;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #bb86fc;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #9c27b0;
+        }
+        .output {
+            margin-top: 20px;
+            background: #2c2c2c;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: #e0e0e0;
+        }
+        .rule-container {
+            margin-top: 12px;
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: #2c2c2c;
+        }
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .rule-header h4 {
+            margin: 0;
+            font-size: 15px;
+            color: #bb86fc;
+        }
+        .rule-header span {
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .rule-fields {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr;
+            gap: 15px;
+        }
+        .rule-fields > div {
+            display: flex;
+            flex-direction: column;
+        }
+        .rule-fields label {
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #bb86fc;
+        }
+        .advanced-fields {
+            display: none;
+        }
+        footer {
+            margin-top: 5px;
+            padding: 15px 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            text-align: center;
+            font-size: 14px;
+        }
+        footer a {
+            color: #53a1fc;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .config-block {
+            margin-bottom: 15px;
+        }
+        .output-textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 13px;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            border-radius: 4px;
+            resize: none;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .copy-button {
+            width: 30%;
+            background-color: #bb86fc;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .copy-button:hover {
+            background-color: #9c27b0;
+        }
+        @media (max-width: 768px) {
+            .output-textarea {
+                font-size: 12px;
+                padding: 8px;
+            }
+            .config-block {
+                margin-bottom: 5px;
+            }
+            .copy-button {
+                width: 45%;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WireGuard Config Generator</h1>
+        <p>Fill in the details below to generate WireGuard configuration files for both the server and its clients.</p>
+        <p>For most users, you’ll likely only need to specify the server address and adjust the number of clients.</p>
+        <label for="server-address">Server Address or IP:</label>
+        <input type="text" id="server-address" placeholder="e.g., example.wireguard.fqdn or 1.2.3.4" value="example.wireguard.fqdn">
+
+        <label for="num-clients">Number of Clients:</label>
+        <input type="number" id="num-clients" placeholder="e.g., 1 - 253" value="1">
+
+        <label for="listen-port">Server Listen Port:</label>
+        <input type="number" id="listen-port" placeholder="e.g., 51820" value="51820">
+
+        <button id="toggle-advanced">Show Advanced Options</button>
+        <div class="advanced-fields" id="advanced-fields">
+            <label for="subnet">WireGuard IPv4 Subnet:</label>
+            <input type="text" id="subnet" placeholder="e.g., 172.30.0.0/24" value="172.30.0.0/24">
+
+            <label for="subnet_ipv6">WireGuard IPv6 Subnet:</label>
+            <input type="text" id="subnet_ipv6" placeholder="e.g., dead:beef:b00b::/64" value="dead:beef:b00b::/64">
+
+            <label for="wan-interface">Server WAN Interface:</label>
+            <input type="text" id="wan-interface" placeholder="e.g., eth0, ens3" value="eth0">
+
+            <label for="allowed-ips">Client Allowed IPs:</label>
+            <input type="text" id="allowed-ips" placeholder="e.g., 0.0.0.0/0, ::/0, 172.30.0.0/24, dead:beef:b00b::/64" value="0.0.0.0/0, ::/0">
+
+            <label for="client-dns">Client DNS:</label>
+            <input type="text" id="client-dns" placeholder="e.g., 8.8.8.8, 2001:4860:4860::8888" value="8.8.8.8, 2001:4860:4860::8888">
+
+            <button onclick="addPortForwardingRule()">Add Port Forwarding Rule</button>
+            <div id="port-forwarding-rules"></div>
+        </div>
+
+        <button onclick="generateConfigs()">Generate Configs</button>
+
+        <div class="output" id="output"></div>
+    </div>
+    <footer>
+        &copy; 2025 LongQT. All Rights Reverse Engineered.
+        <br>
+        Source and how to guide:
+        <a href="https://github.com/LongQT-sea/wg-generator" target="_blank">Github</a>
+    </footer>
+    <script>
+        const advancedFields = document.getElementById('advanced-fields');
+        const toggleButton = document.getElementById('toggle-advanced');
+        let isAdvancedMode = false;
+
+        toggleButton.addEventListener('click', () => {
+            isAdvancedMode = !isAdvancedMode;
+            if (isAdvancedMode) {
+                advancedFields.style.display = 'block';
+                toggleButton.textContent = 'Hide Advanced Options';
+            } else {
+                advancedFields.style.display = 'none';
+                toggleButton.textContent = 'Show Advanced Options';
+            }
+        });
+
+        let ruleCounter = 0;
+
+        function addPortForwardingRule() {
+            const container = document.getElementById('port-forwarding-rules');
+            const ruleId = `rule-${ruleCounter++}`;
+            const ruleDiv = document.createElement('div');
+
+            ruleDiv.id = ruleId;
+            ruleDiv.classList.add('rule-container');
+
+            ruleDiv.innerHTML = `
+                <div class="rule-header">
+                    <h4>Rule ${ruleCounter}</h4>
+                    <span id="${ruleId}-remove">Remove</span>
+                </div>
+                <div class="rule-fields">
+                    <div>
+                        <label for="${ruleId}-protocol">Protocol:</label>
+                        <select id="${ruleId}-protocol">
+                            <option value="tcp">TCP</option>
+                            <option value="udp">UDP</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="${ruleId}-port">Port(s):</label>
+                        <input type="text" id="${ruleId}-port" placeholder="e.g., 5000 or 20000:20200 for port range">
+                    </div>
+                    <div>
+                        <label for="${ruleId}-destination">Destination IP:</label>
+                        <input type="text" id="${ruleId}-destination" placeholder="e.g., 172.30.0.2" value="172.30.0.2">
+                    </div>
+                </div>
+            `;
+
+            const removeButton = ruleDiv.querySelector(`#${ruleId}-remove`);
+            removeButton.addEventListener('click', () => removeRule(ruleId));
+            container.appendChild(ruleDiv);
+        }
+
+        function removeRule(ruleId) {
+            const ruleDiv = document.getElementById(ruleId);
+            ruleDiv.remove();
+        }
+
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+
+        function generateConfigs() {
+            const serverAddress = document.getElementById('server-address').value.trim();
+            const serverPort = document.getElementById('listen-port').value.trim();
+            const subnet = document.getElementById('subnet').value.trim();
+            const subnetIPv6 = document.getElementById('subnet_ipv6').value.trim();
+            const wanInterface = document.getElementById('wan-interface').value.trim();
+            const allowedIps = document.getElementById('allowed-ips').value.trim();
+            const clientDNS = document.getElementById('client-dns').value.trim();
+            const numClients = parseInt(document.getElementById('num-clients').value.trim(), 10);
+
+            if (isNaN(numClients) || numClients < 1 || numClients > 253) {
+                alert("Number of clients must be between 1 and 253.");
+                return;
+            }
+            if (!serverAddress || !serverPort || !subnet || !wanInterface || !subnetIPv6 || !clientDNS || !allowedIps) {
+                alert("Please fill in all required fields");
+                return;
+            }
+
+            const [subnetBase, cidr] = subnet.split('/');
+            const subnetParts = subnetBase.split('.');
+            const baseIp = `${subnetParts[0]}.${subnetParts[1]}.${subnetParts[2]}.`;
+            const serverIp = `${baseIp}1/${cidr}`;
+            const [subnetBaseIPv6, cidrIPv6] = subnetIPv6.split('/');
+            const serverIpIPv6 = `${subnetBaseIPv6.replace('::', '::1')}/${cidrIPv6}`;
+            const serverKeys = window.wireguard.generateKeypair();
+
+            let serverConfig = `
+[Interface]
+PrivateKey = ${serverKeys.privateKey}
+Address = ${serverIp}, ${serverIpIPv6}
+ListenPort = ${serverPort}
+
+# Enable IP Forward
+PostUp = sysctl -w net.ipv4.ip_forward=1
+PostUp = sysctl -w net.ipv6.conf.all.forwarding=1
+
+# Enable NAT
+PostUp = iptables -t filter -A FORWARD -i %i -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -s ${subnet} ! -d ${subnet} -j MASQUERADE
+PostUp = ip6tables -t filter -A FORWARD -i %i -j ACCEPT
+PostUp = ip6tables -t nat -A POSTROUTING -s ${subnetIPv6} ! -d ${subnetIPv6} -j MASQUERADE
+
+# Fix possible TCP MSS Clamping issue
+PostUp = iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+PostUp = ip6tables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+# Cleanup post down
+PostDown = iptables -t filter -D FORWARD -i %i -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -s ${subnet} ! -d ${subnet} -j MASQUERADE
+PostDown = iptables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+PostDown = ip6tables -t filter -D FORWARD -i %i -j ACCEPT
+PostDown = ip6tables -t nat -D POSTROUTING -s ${subnetIPv6} ! -d ${subnetIPv6} -j MASQUERADE
+PostDown = ip6tables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+`;
+
+            function mapIPv4ToIPv6(ipv4) {
+                const ipv4Parts = ipv4.split('.');
+                const lastOctet = ipv4Parts[ipv4Parts.length - 1];
+                return `${subnetBaseIPv6.replace('::', `::${lastOctet}`)}`;
+            }
+
+            const portForwardingRules = [];
+            document.querySelectorAll('.rule-container').forEach(ruleDiv => {
+                const protocol = ruleDiv.querySelector('select').value;
+                const port = ruleDiv.querySelector('input[id$="-port"]').value.trim();
+                const destinationIPv4 = ruleDiv.querySelector('input[id$="-destination"]').value.trim();
+                if (protocol && port && destinationIPv4) {
+                    const destinationIPv6 = mapIPv4ToIPv6(destinationIPv4);
+                    portForwardingRules.push({ protocol, port, destinationIPv4, destinationIPv6 });
+                }
+            });
+
+            portForwardingRules.forEach(({ protocol, port, destinationIPv4, destinationIPv6 }) => {
+                serverConfig += `
+PostUp = iptables -t nat -A PREROUTING -i ${wanInterface} -p ${protocol} --dport ${port} -j DNAT --to-destination ${destinationIPv4}
+PostUp = ip6tables -t nat -A PREROUTING -i ${wanInterface} -p ${protocol} --dport ${port} -j DNAT --to-destination ${destinationIPv6}
+PostDown = iptables -t nat -D PREROUTING -i ${wanInterface} -p ${protocol} --dport ${port} -j DNAT --to-destination ${destinationIPv4}
+PostDown = ip6tables -t nat -D PREROUTING -i ${wanInterface} -p ${protocol} --dport ${port} -j DNAT --to-destination ${destinationIPv6}
+`;
+            });
+
+            let clientConfigs = [];
+            for (let i = 1; i <= numClients; i++) {
+                const clientIp = `${baseIp}${i + 1}/${cidr}`;
+                const clientIpIPv6 = `${subnetBaseIPv6.replace('::', `::${i + 1}`)}/${cidrIPv6}`;
+                const clientKeys = window.wireguard.generateKeypair();
+                serverConfig += `
+[Peer]
+PublicKey = ${clientKeys.publicKey}
+AllowedIPs = ${clientIp.split('/')[0]}/32, ${clientIpIPv6.split('/')[0]}/128`;
+                const clientConfig = `
+[Interface]
+PrivateKey = ${clientKeys.privateKey}
+Address = ${clientIp}, ${clientIpIPv6}
+DNS = ${clientDNS}
+
+[Peer]
+PublicKey = ${serverKeys.publicKey}
+Endpoint = ${serverAddress}:${serverPort}
+AllowedIPs = ${allowedIps}
+PersistentKeepalive = 25`;
+                clientConfigs.push(clientConfig);
+            }
+
+            let output = '';
+            output += `<h3>### Server configuration</h3>`;
+            output += `<div class="config-block"><textarea class="output-textarea" readonly>${serverConfig}</textarea><button class="copy-button" data-clipboard="${encodeURIComponent(serverConfig)}">Copy</button></div>\n\n`;
+            clientConfigs.forEach((config, index) => {
+                output += `<h3>### Client ${index + 1} configuration</h3>`;
+                output += `<div class="config-block"><textarea class="output-textarea" readonly>${config}</textarea><button class="copy-button" data-clipboard="${encodeURIComponent(config)}">Copy</button></div>\n\n`;
+            });
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = output;
+
+            document.querySelectorAll('.output-textarea').forEach(textarea => {
+                autoResizeTextarea(textarea);
+                textarea.addEventListener('focus', () => {
+                    textarea.select();
+                });
+            });
+
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const textToCopy = decodeURIComponent(button.getAttribute('data-clipboard'));
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        button.textContent = 'Copied!';
+                        setTimeout(() => {
+                            button.textContent = 'Copy';
+                        }, 2000);
+                    });
+                });
+            });
+        }
+    </script>
+    <script src="wireguard.js" defer ></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }).catch((error) => {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+        });
+      }
+    </script>
+</body>
+</html>
