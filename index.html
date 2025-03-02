@@ -6,7 +6,7 @@
     <title>WireGuard Config Generator</title>
     <meta name="description" content="Generate secure WireGuard configurations for servers and clients effortlessly with our intuitive online tool. Perfect for VPN setup beginners and experts alike!">
     <link rel="icon" sizes="64x64" href="ico/favicon-64.png">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/wg-generator/manifest.json">
     <meta name="theme-color" content="#bb86fc">
     <style>
         body {
@@ -423,15 +423,15 @@ PersistentKeepalive = 25`;
     </script>
     <script src="wireguard.js" defer ></script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./service-worker.js').then((registration) => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }).catch((error) => {
-            console.log('ServiceWorker registration failed: ', error);
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/wg-generator/service-worker.js').then((registration) => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }).catch((error) => {
+              console.log('ServiceWorker registration failed: ', error);
+            });
           });
-        });
-      }
-    </script>
+        }
+      </script>
 </body>
 </html>

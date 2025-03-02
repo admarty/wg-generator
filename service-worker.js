@@ -1,10 +1,10 @@
 const CACHE_NAME = 'wireguard-config-generator-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/wireguard.js',
-  '/manifest.json',
-  '/ico/favicon-64.png'
+  '/wg-generator/',
+  '/wg-generator/index.html',
+  '/wg-generator/wireguard.js',
+  '/wg-generator/manifest.json',
+  '/wg-generator/ico/favicon-64.png'
 ];
 
 // Install the service worker and cache assets
