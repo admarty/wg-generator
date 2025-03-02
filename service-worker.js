@@ -4,7 +4,8 @@ const urlsToCache = [
   '/wg-generator/index.html',
   '/wg-generator/wireguard.js',
   '/wg-generator/manifest.json',
-  '/wg-generator/ico/favicon-64.png'
+  '/wg-generator/ico/favicon-64.png',
+  '/wg-generator/ico/icon-192.png'
 ];
 
 // Install the service worker and cache assets
